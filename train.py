@@ -28,7 +28,8 @@ def main():
     parser.add_argument("--gpu", type=int, default=-1)
     parser.add_argument("--batchsize", type=int, default=10)
     parser.add_argument("--outdirname", required=True)
-    parser.add_argument("--recursive", type=int, default=3)
+    parser.add_argument("--n_recursive", type=int, default=3)
+    parser.add_argument("--n_residual", type=int, default=6)
     parser.add_argument("--model")
     args = parser.parse_args()
 
@@ -57,7 +58,7 @@ def main():
                                     repeat=True,
                                     shuffle=True)
 
-    model = models.DRRN()
+    model = models.DRRN(n_recursive=args.n_recursive, n_residual=args.n_residual)
     if args.model is not None:
         chainer.serializers.load_npz(args.model, model)
     if args.gpu >= 0:

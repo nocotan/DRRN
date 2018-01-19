@@ -38,12 +38,12 @@ class RecursiveBlock(Chain):
 
 
 class DRRN(Chain):
-    def __init__(self, n_recursive=5):
+    def __init__(self, n_recursive=3, n_residual=6):
         super(DRRN, self).__init__()
         with self.init_scope():
             self.n_recursive = n_recursive
             self.conv = L.Convolution2D(None, 3, ksize=3, stride=1, pad=1)
-            self.recur = RecursiveBlock()
+            self.recur = RecursiveBlock(n_residual=n_residual)
 
     def __call__(self, x: chainer.Variable):
         h = x
