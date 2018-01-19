@@ -76,7 +76,7 @@ def main():
         optimizer.update(forward, lr, hr, model)
 
 
-        if it % 50 == 0:
+        if it % 10 == 0:
             print("Epoch: {}, Loss: {}".format(it, loss.data))
             sr = numpy.array(model(lr).data)[0]
             sr = sr.reshape(96, 96, 3)
