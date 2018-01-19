@@ -79,7 +79,7 @@ def main():
 
         if it % 10 == 0:
             print("Epoch: {}, Loss: {}".format(it, loss.data))
-            sr = numpy.array(model(lr).data)[0]
+            sr = xp.array(model(lr).data)[0]
             sr = sr.reshape(96, 96, 3)
             scipy.misc.imsave("output/out.png", sr)
             chainer.serializers.save_npz(

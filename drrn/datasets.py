@@ -5,8 +5,10 @@ import numpy
 import cv2
 import random
 from PIL import Image
+import chainer
 from chainer.dataset import dataset_mixin
 
+xp = numpy
 
 class PILImageDataset(dataset_mixin.DatasetMixin):
     def __init__(self, paths, resize=None, root='.'):
@@ -30,18 +32,18 @@ class PILImageDataset(dataset_mixin.DatasetMixin):
 
 
 class ResizedImageDataset(dataset_mixin.DatasetMixin):
-    def __init__(self, paths, resize=None, root='.', dtype=numpy.float32):
+    def __init__(self, paths, resize=None, root='.', dtype=xp.float32):
         self.base = PILImageDataset(paths=paths, resize=resize, root=root)
         self._dtype = dtype
 
     def __len__(self):
         return len(self.base)
 
-    def get_example(self, i) -> numpy.ndarray:
+    def get_example(self, i):
         image = self.base[i]
-        image_ary = numpy.asarray(image, dtype=self._dtype)
+        image_ary = xp.asarray(image, dtype=self._dtype)
         if len(image_ary.shape) == 2:
-            image_ary = numpy.dstack((image_ary, image_ary, image_ary))
+            image_ary = xp.dstack((image_ary, image_ary, image_ary))
         image_data = image_ary.transpose(2, 0, 1)
         if image_data.shape[0] == 4:
             image_data = image_data[:3]
@@ -50,15 +52,20 @@ class ResizedImageDataset(dataset_mixin.DatasetMixin):
 
 class PreprocessedImageDataset(dataset_mixin.DatasetMixin):
     def __init__(self, paths, cropsize, resize=None, root='.',
-                 dtype=numpy.float32):
+                 dtype=xp.float32, gpu=-1):
         self.base = ResizedImageDataset(paths=paths, resize=resize, root=root)
         self._dtype = dtype
         self.cropsize = cropsize
 
+        if gpu > 0:
+            xp = chainer.cuda.cupy
+        else:
+            xp = numpy
+
     def __len__(self):
         return len(self.base)
 
-    def get_example(self, i) -> numpy.ndarray:
+    def get_example(self, i):
         image = self.base[i]
         x = random.randint(0, image.shape[1] - self.cropsize)
         y = random.randint(0, image.shape[2] - self.cropsize)
