@@ -29,6 +29,7 @@ def main():
     parser.add_argument("--batchsize", type=int, default=10)
     parser.add_argument("--outdirname", required=True)
     parser.add_argument("--recursive", type=int, default=3)
+    parser.add_argument("--model")
     args = parser.parse_args()
 
     OUTPUT_DIRECTORY = args.outdirname
@@ -44,6 +45,7 @@ def main():
         xp = numpy
 
     # load dataset
+    print("loading dataset...")
     paths = glob.glob(args.dataset)
     dataset = datasets.PreprocessedImageDataset(
         paths=paths,
@@ -56,25 +58,32 @@ def main():
                                     shuffle=True)
 
     model = models.DRRN()
+    if args.model is not None:
+        chainer.serializers.load_npz(args.model, model)
     if args.gpu >= 0:
         model.to_gpu()
 
     optimizer = Adam()
     optimizer.setup(model)
 
-    for epoch in range(50):
-        for zipped_batch in tqdm(iterator):
-            lr = chainer.Variable(xp.array([zipped[0] for zipped in zipped_batch]))
-            hr = chainer.Variable(xp.array([zipped[1] for zipped in zipped_batch]))
+    it = 0
+    print("training...")
+    for zipped_batch in iterator:
+        lr = chainer.Variable(xp.array([zipped[0] for zipped in zipped_batch]))
+        hr = chainer.Variable(xp.array([zipped[1] for zipped in zipped_batch]))
 
-            loss = forward(lr, hr, model)
-            optimizer.update(forward, lr, hr, model)
+        loss = forward(lr, hr, model)
+        optimizer.update(forward, lr, hr, model)
 
 
-        print("Epoch: {}, Loss: {}".format(epoch, loss.data))
-        sr = numpy.array(model(lr).data)[0]
-        sr = sr.reshape(96, 96, 3)
-        scipy.misc.imsave("output/out.png", sr)
+        if it % 50 == 0:
+            print("Epoch: {}, Loss: {}".format(it, loss.data))
+            sr = numpy.array(model(lr).data)[0]
+            sr = sr.reshape(96, 96, 3)
+            scipy.misc.imsave("output/out.png", sr)
+            chainer.serializers.save_npz(
+            os.path.join(OUTPUT_DIRECTORY, "generator_model_{}.npz".format(it)), model)
+        it += 1
 
 
 if __name__ == '__main__':

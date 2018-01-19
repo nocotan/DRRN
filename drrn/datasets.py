@@ -68,4 +68,8 @@ class PreprocessedImageDataset(dataset_mixin.DatasetMixin):
             cropeed_high_res.transpose(1, 2, 0),
             dsize=(int(self.cropsize/4), int(self.cropsize/4)),
             interpolation=cv2.INTER_CUBIC).transpose(2, 0, 1)
+        cropped_low_res = cv2.resize(
+            cropped_low_res.transpose(1, 2, 0),
+            dsize=(int(self.cropsize), int(self.cropsize)),
+            interpolation=cv2.INTER_CUBIC).transpose(2, 0, 1)
         return cropped_low_res, cropeed_high_res
