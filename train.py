@@ -6,7 +6,7 @@ import os
 import scipy.misc
 from tqdm import tqdm
 
-import numpy
+import numpy as np
 import chainer
 import chainer.functions as F
 from chainer.optimizers import Adam
@@ -38,19 +38,20 @@ def main():
         os.makedirs(OUTPUT_DIRECTORY)
 
     # GPU
-    if args.gpu > 0:
+    if args.gpu >= 0:
         chainer.cuda.check_cuda_available()
         chainer.cuda.get_device(args.gpu).use()
         xp = chainer.cuda.cupy
     else:
-        xp = numpy
+        xp = np
 
     # load dataset
     print("loading dataset...")
     paths = glob.glob(args.dataset)
     dataset = datasets.PreprocessedImageDataset(
         paths=paths,
-        cropsize=96, resize=(300, 300)
+        cropsize=96, resize=(300, 300),
+        dtype=xp.float32
     )
 
     iterator = MultiprocessIterator(dataset,
@@ -79,7 +80,7 @@ def main():
 
         if it % 10 == 0:
             print("Epoch: {}, Loss: {}".format(it, loss.data))
-            sr = xp.array(model(lr).data)[0]
+            sr = chainer.cuda.to_cpu(model(lr).data)[0]
             sr = sr.reshape(96, 96, 3)
             scipy.misc.imsave("output/out.png", sr)
             chainer.serializers.save_npz(
