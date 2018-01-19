@@ -9,9 +9,9 @@ class ResBlock(Chain):
     def __init__(self):
         super(ResBlock, self).__init__()
         with self.init_scope():
-            self.cn1 = L.Convolution2D(None, 64, ksize=3, stride=1, pad=1)
+            self.cn1 = L.Convolution2D(None, 128, ksize=3, stride=1, pad=1)
             self.cn2 = L.Convolution2D(None, 3, ksize=3, stride=1, pad=1)
-            self.bn1 = L.BatchNormalization(64)
+            self.bn1 = L.BatchNormalization(128)
             self.bn2 = L.BatchNormalization(3)
 
     def __call__(self, x: chainer.Variable):
