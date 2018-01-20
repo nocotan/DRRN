@@ -4,6 +4,7 @@ import six
 import numpy as np
 import cv2
 import random
+import scipy.misc
 from PIL import Image
 import chainer
 from chainer.dataset import dataset_mixin
@@ -63,13 +64,17 @@ class PreprocessedImageDataset(dataset_mixin.DatasetMixin):
         x = random.randint(0, image.shape[1] - self.cropsize)
         y = random.randint(0, image.shape[2] - self.cropsize)
 
-        cropeed_high_res = image[:, x:x + self.cropsize, y:y + self.cropsize]
+        cropped_high_res = image[:, x:x + self.cropsize, y:y + self.cropsize]
         cropped_low_res = cv2.resize(
-            cropeed_high_res.transpose(1, 2, 0),
-            dsize=(int(self.cropsize/4), int(self.cropsize/4)),
+            cropped_high_res.transpose(1, 2, 0),
+            dsize=(int(self.cropsize/5), int(self.cropsize/5)),
             interpolation=cv2.INTER_CUBIC).transpose(2, 0, 1)
         cropped_low_res = cv2.resize(
             cropped_low_res.transpose(1, 2, 0),
             dsize=(int(self.cropsize), int(self.cropsize)),
             interpolation=cv2.INTER_CUBIC).transpose(2, 0, 1)
-        return cropped_low_res, cropeed_high_res
+
+        scipy.misc.imsave("lr.png", cropped_low_res.reshape(192, 192, 3))
+        scipy.misc.imsave("hr.png", cropped_high_res.reshape(192, 192, 3))
+
+        return cropped_low_res, cropped_high_res

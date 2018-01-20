@@ -50,7 +50,7 @@ def main():
     paths = glob.glob(args.dataset)
     dataset = datasets.PreprocessedImageDataset(
         paths=paths,
-        cropsize=96, resize=(300, 300),
+        cropsize=192, resize=(500, 500),
         dtype=xp.float32
     )
 
@@ -69,7 +69,6 @@ def main():
     optimizer.setup(model)
 
     it = 0
-    print("Num of parameter: ", sum(p.data.size for p in model.params()))
     print("training...")
     for zipped_batch in iterator:
         lr = chainer.Variable(xp.array([zipped[0] for zipped in zipped_batch]))
@@ -82,7 +81,7 @@ def main():
         if it % 100 == 0:
             print("Epoch: {}, Loss: {}".format(it, loss.data))
             sr = chainer.cuda.to_cpu(model(lr).data)[0]
-            sr = sr.reshape(96, 96, 3)
+            sr = sr.reshape(192, 192, 3)
             scipy.misc.imsave("output/out.png", sr)
             chainer.serializers.save_npz(
             os.path.join(OUTPUT_DIRECTORY, "model_{}.npz".format(it)), model)
