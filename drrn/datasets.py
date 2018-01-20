@@ -67,14 +67,14 @@ class PreprocessedImageDataset(dataset_mixin.DatasetMixin):
         cropped_high_res = image[:, x:x + self.cropsize, y:y + self.cropsize]
         cropped_low_res = cv2.resize(
             cropped_high_res.transpose(1, 2, 0),
-            dsize=(int(self.cropsize/5), int(self.cropsize/5)),
+            dsize=(int(self.cropsize/4), int(self.cropsize/4)),
             interpolation=cv2.INTER_CUBIC).transpose(2, 0, 1)
         cropped_low_res = cv2.resize(
             cropped_low_res.transpose(1, 2, 0),
             dsize=(int(self.cropsize), int(self.cropsize)),
             interpolation=cv2.INTER_CUBIC).transpose(2, 0, 1)
 
-        scipy.misc.imsave("lr.png", cropped_low_res.reshape(192, 192, 3))
-        scipy.misc.imsave("hr.png", cropped_high_res.reshape(192, 192, 3))
+        #scipy.misc.imsave("lr.png", cropped_low_res.reshape(192, 192, 3))
+        #scipy.misc.imsave("hr.png", cropped_high_res.reshape(192, 192, 3))
 
         return cropped_low_res, cropped_high_res

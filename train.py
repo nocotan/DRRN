@@ -50,7 +50,7 @@ def main():
     paths = glob.glob(args.dataset)
     dataset = datasets.PreprocessedImageDataset(
         paths=paths,
-        cropsize=192, resize=(500, 500),
+        cropsize=96,
         dtype=xp.float32
     )
 
@@ -78,10 +78,10 @@ def main():
         optimizer.update(forward, lr, hr, model)
 
 
-        if it % 100 == 0:
+        if it % 10 == 0:
             print("Epoch: {}, Loss: {}".format(it, loss.data))
             sr = chainer.cuda.to_cpu(model(lr).data)[0]
-            sr = sr.reshape(192, 192, 3)
+            sr = sr.reshape(96, 96, 3)
             scipy.misc.imsave("output/out.png", sr)
             chainer.serializers.save_npz(
             os.path.join(OUTPUT_DIRECTORY, "model_{}.npz".format(it)), model)
