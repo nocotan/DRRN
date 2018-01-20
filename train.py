@@ -84,7 +84,7 @@ def main():
             sr = sr.reshape(96, 96, 3)
             scipy.misc.imsave("output/out.png", sr)
             chainer.serializers.save_npz(
-            os.path.join(OUTPUT_DIRECTORY, "generator_model_{}.npz".format(it)), model)
+            os.path.join(OUTPUT_DIRECTORY, "model_{}.npz".format(it)), model)
         it += 1
 
 
