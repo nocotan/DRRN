@@ -78,7 +78,7 @@ def main():
         optimizer.update(forward, lr, hr, model)
 
 
-        if it % 10 == 0:
+        if it % 100 == 0:
             print("Epoch: {}, Loss: {}".format(it, loss.data))
             sr = chainer.cuda.to_cpu(model(lr).data)[0]
             sr = sr.reshape(96, 96, 3)
