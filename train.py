@@ -69,6 +69,7 @@ def main():
     optimizer.setup(model)
 
     it = 0
+    print("Num of parameter: ", sum(p.data.size for p in model.params()))
     print("training...")
     for zipped_batch in iterator:
         lr = chainer.Variable(xp.array([zipped[0] for zipped in zipped_batch]))

@@ -40,8 +40,11 @@ def main():
 
     model = models.DRRN()
     chainer.serializers.load_npz(args.model, model)
+    print("Num of parameter: ", sum(p.data.size for p in model.params()))
 
-    img = np.asarray(Image.open(args.image), dtype=np.float32)
+    img = Image.open(args.image)
+    img = img.resize((int(img.width*2), int(img.height*2)))
+    img = np.asarray(img, dtype=np.float32)
     if img.shape[2] == 4:
         img = img[:, :, :3]
 
